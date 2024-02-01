@@ -25,7 +25,7 @@ const renderWithRedux = (
   };
 };
 
-test("fethces user information and displays it", async () => {
+test("fetches user information and displays it", async () => {
   const mockData = generateRandomUser();
   const { getByText } = renderWithRedux(<App />, {
     initialState: { user: { data: mockData } },
@@ -46,7 +46,7 @@ test("fethces user information and displays it", async () => {
 
 });
 
-test("handles API error gracefully", async () => {
+test("handles API error", async () => {
 
   // Mock the fetch function to simulate an API error
   global.fetch = jest.fn().mockRejectedValueOnce(new Error("API error"));
