@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "./slices/userSlice";
+import axios from "axios";
+import UserComponent from "./components/UserComponent";
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(
+        "https://mocki.io/v1/1a81b254-2cb4-498e-981e-7e4d38e3398f"
+      );
+      const data = await response.data;
+      dispatch(setUser(data))
+    }
+
+    fetchData()
+  }, [dispatch])
+  return <div>
+    <h1>React App with Redux Toolkit</h1>
+    <UserComponent/>
+  </div>;
 }
 
 export default App;
