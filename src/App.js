@@ -1,28 +1,19 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setUser } from "./slices/userSlice";
-import axios from "axios";
+
+import { useGetUserQuery } from "./slices/api";
 import UserComponent from "./components/UserComponent";
 
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(
-        "https://mocki.io/v1/1a81b254-2cb4-498e-981e-7e4d38e3398f"
-      );
-      const data = await response.data;
-      dispatch(setUser(data))
-    }
-
-    fetchData()
-  }, [dispatch])
-  return <div>
-    <h1>React App with Redux Toolkit</h1>
-    <UserComponent/>
-  </div>;
+ const { data, isError, isLoading } = useGetUserQuery();
+  
+  return (
+    <div>
+      <h1>React App with Redux Toolkit Query</h1>
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Error: {isError}</p>}
+      {data && <UserComponent />}
+    </div>
+  );
 }
 
 export default App;

@@ -1,9 +1,17 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { selectUser } from '../slices/userSlice'
+import { useGetUserQuery } from "../slices/api";
 
 const UserComponent = () => {
-    const user = useSelector(selectUser)
+  const { data: user, isError, isLoading } = useGetUserQuery();
+  
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (isError) {
+    return <p>Error loading user information.</p>;
+  }
+
   return (
       <div>
           <h2>User Information</h2>

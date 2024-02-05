@@ -1,7 +1,5 @@
-import { render } from "@testing-library/react";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "../slices/userSlice";
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
 import UserComponent from "./UserComponent";
 
 const generateRandomUser = () => ({
@@ -9,28 +7,30 @@ const generateRandomUser = () => ({
   age: Math.floor(Math.random() * (99 - 18 + 1)) + 18,
 });
 
-const renderWithRedux = (
-  component,
-  {
-    initialState = { user: { data: generateRandomUser() } },
-    store = configureStore({
-      reducer: { user: userReducer },
-      preloadedState: initialState,
-    }),
-  } = {}
-) => {
-  return {
-    ...render(<Provider store={store}>{component}</Provider>),
-    store,
-  };
-};
+jest.mock("../slices/api", () => ({
+  useGetUserQuery: jest.fn(),
+}));
 
-test("renders user information correctly", () => {
-  const userData = generateRandomUser();
-  const { getByText } = renderWithRedux(<UserComponent />, {
-    initialState: { user: { data: userData } },
+const mockUser = generateRandomUser();
+
+describe("UserComponent", () => {
+  test("renders user information with mock data", async () => {
+    const mockUseGetUserQuery = jest.fn();
+    mockUseGetUserQuery.mockReturnValue({
+      data: mockUser,
+      isError: false,
+      isLoading: false,
+    });
+
+    require("../slices/api").useGetUserQuery = mockUseGetUserQuery;
+    render(<UserComponent />);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Loading...")).toBeNull();
+    });
+
+    expect(screen.getByText("User Information")).toBeInTheDocument();
+    expect(screen.getByText(`Name: ${mockUser.name}`)).toBeInTheDocument();
+    expect(screen.getByText(`Age: ${mockUser.age}`)).toBeInTheDocument();
   });
-
-  expect(getByText(`Name: ${userData.name}`)).toBeInTheDocument();
-  expect(getByText(`Age: ${userData.age}`)).toBeInTheDocument();
 });
